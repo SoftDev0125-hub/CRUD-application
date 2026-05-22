@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+backend/vendor/
+
+# Environment & secrets
+.env
+.env.*
+!.env.example
+frontend/.env
+
+# Database
+backend/database/*.sqlite*
+
+# Build output
+frontend/dist/
+
+# Composer (install globally or download locally)
+composer.phar
+composer-setup.php
+
+# OS & editors
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.log
