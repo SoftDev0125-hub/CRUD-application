@@ -109,6 +109,21 @@ DB_PASSWORD=your_password
 - Vite dev proxy forwards `http://localhost:5173/api/*` → `http://127.0.0.1:8000/api/*`.
 - Set `VITE_API_URL` in `frontend/.env` when calling the API from React (see `.env.example`).
 
-## Next steps
+## Tabletop Shelf (trial app)
 
-Build your CRUD resources: models and migrations in Laravel, API controllers/routes, and React pages/components that call the API.
+Board game collection CRUD with **React + TypeScript** frontend and **Laravel** API.
+
+### API endpoints
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/games` | List games (`search`, `tag`, `sort`, `direction` query params) |
+| POST | `/api/games` | Create game |
+| GET | `/api/games/{id}` | Get one game |
+| PUT | `/api/games/{id}` | Update game |
+| DELETE | `/api/games/{id}` | Delete game |
+| GET | `/api/games/{id}/enrichment` | Wikipedia summary (3rd-party) |
+
+After migrating, seed sample data: `php artisan db:seed`
+
+Set `VITE_USE_MOCK=false` in `frontend/.env` to use the real API.
