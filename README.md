@@ -47,7 +47,7 @@ php artisan key:generate
 # Create DB file if missing (SQLite):
 # New-Item -ItemType File -Path database\database.sqlite -Force
 
-php artisan migrate
+php artisan db:setup
 php artisan serve
 ```
 
@@ -66,9 +66,38 @@ npm run dev
 
 App runs at **http://localhost:5173**. Requests to `/api/*` are proxied to Laravel (see `frontend/vite.config.ts`).
 
-## Database
+## Database (SQL)
 
-Default: **SQLite** file at `backend/database/database.sqlite`.
+Persistent storage in **`board_games`** — not in-memory. Default engine: **SQLite** (`backend/database/database.sqlite`).
+
+### Schema: `board_games`
+
+| Column | Type | Notes |
+|--------|------|--------|
+| `id` | bigint | Primary key |
+| `title` | string | Game name |
+| `designer` | string | Indexed (nested sort) |
+| `publisher` | string | |
+| `year_published` | smallint | |
+| `min_players` / `max_players` | tinyint | |
+| `play_time_minutes` | smallint | |
+| `rating` | decimal(3,1) | 1.0–10.0 |
+| `tags` | JSON | e.g. `["family","euro"]` — filter with `whereJsonContains` |
+| `created_at` / `updated_at` | timestamp | |
+
+Reference DDL: `backend/database/sql/schema.sql` · Sample INSERTs: `backend/database/sql/seed.sql`
+
+### Setup (recommended)
+
+```powershell
+cd backend
+php artisan db:setup          # migrate + seed (creates .sqlite if missing)
+php artisan db:setup --fresh  # drop all tables, re-migrate, re-seed
+```
+
+Or manually: `php artisan migrate` then `php artisan db:seed`
+
+### SQLite (default)
 
 `backend/.env`:
 
@@ -78,7 +107,7 @@ DB_CONNECTION=sqlite
 
 ### MySQL / MariaDB (optional)
 
-1. Create a database (e.g. `crud_app`).
+1. Create database `crud_app` and run `backend/database/sql/schema.sql` (or `php artisan migrate`).
 2. In `backend/.env`:
 
 ```env
@@ -90,7 +119,7 @@ DB_USERNAME=root
 DB_PASSWORD=your_password
 ```
 
-3. Run `php artisan migrate`.
+3. `php artisan db:seed` or import `backend/database/sql/seed.sql`.
 
 ## Development commands
 
@@ -99,7 +128,8 @@ DB_PASSWORD=your_password
 | `frontend/` | `npm run dev` | Vite dev server |
 | `frontend/` | `npm run build` | Production build |
 | `backend/` | `php artisan serve` | Laravel HTTP server |
-| `backend/` | `php artisan migrate` | Run SQL migrations |
+| `backend/` | `php artisan db:setup` | Migrate + seed SQL database |
+| `backend/` | `php artisan migrate` | Run migrations only |
 | `backend/` | `php artisan test` | PHPUnit tests |
 | Root | `composer.bat …` | Composer via bundled `composer.phar` |
 
