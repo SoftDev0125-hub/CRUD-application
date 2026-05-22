@@ -14,6 +14,12 @@ class WikipediaEnrichmentProvider implements EnrichmentProvider
 
     public function enrich(string $subject): EnrichmentResult
     {
+        $subject = mb_substr(trim($subject), 0, 255);
+
+        if ($subject === '') {
+            return $this->fallback('Unknown');
+        }
+
         $pageTitle = $this->resolvePageTitle($subject);
 
         $response = Http::timeout(8)

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { gamesApi } from '../api/games'
-import { ApiError } from '../api/client'
+import { toUserMessage } from '../utils/apiErrors'
 import type {
   BoardGame,
   GameInput,
@@ -76,13 +76,7 @@ export function useGames() {
 
       setGames(rows)
     } catch (err) {
-      const message =
-        err instanceof ApiError
-          ? `API error: ${err.message}`
-          : err instanceof Error
-            ? err.message
-            : 'Failed to load games'
-      setError(message)
+      setError(toUserMessage(err))
       setGames([])
     } finally {
       setLoading(false)
@@ -136,9 +130,7 @@ export function useGames() {
         closeForm()
         await fetchGames(appliedControls)
       } catch (err) {
-        const message =
-          err instanceof Error ? err.message : 'Failed to save game'
-        setError(message)
+        setError(toUserMessage(err))
         throw err
       }
     },
@@ -152,9 +144,7 @@ export function useGames() {
         await gamesApi.remove(id)
         await fetchGames(appliedControls)
       } catch (err) {
-        const message =
-          err instanceof Error ? err.message : 'Failed to delete game'
-        setError(message)
+        setError(toUserMessage(err))
         throw err
       }
     },

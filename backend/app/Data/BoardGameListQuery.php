@@ -2,6 +2,7 @@
 
 namespace App\Data;
 
+use App\Support\InputSanitizer;
 use Illuminate\Http\Request;
 
 readonly class BoardGameListQuery
@@ -27,9 +28,15 @@ readonly class BoardGameListQuery
 
     public static function fromRequest(Request $request): self
     {
-        $search = $request->string('search')->trim()->toString();
-        $tag = $request->string('tag')->trim()->toString();
-        $sortParam = $request->string('sort')->trim()->toString();
+        $search = InputSanitizer::clampString(
+            $request->string('search')->toString(),
+            (int) config('security.max_search_length', 100)
+        );
+        $tag = InputSanitizer::clampString(
+            $request->string('tag')->toString(),
+            (int) config('security.max_tag_length', 50)
+        );
+        $sortParam = InputSanitizer::clampString($request->string('sort')->toString(), 80) ?? '';
         $direction = $request->query('direction', 'asc') === 'desc' ? 'desc' : 'asc';
 
         $sortFields = $sortParam !== ''
@@ -41,9 +48,11 @@ readonly class BoardGameListQuery
             fn (string $field) => in_array($field, self::SORTABLE, true)
         ));
 
+        $sortFields = array_slice($sortFields, 0, 3);
+
         return new self(
-            search: $search !== '' ? $search : null,
-            tag: $tag !== '' ? $tag : null,
+            search: $search,
+            tag: $tag,
             sortFields: $sortFields,
             direction: $direction,
         );

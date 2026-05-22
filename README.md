@@ -157,3 +157,18 @@ Board game collection CRUD with **React + TypeScript** frontend and **Laravel** 
 After migrating, seed sample data: `php artisan db:seed`
 
 Set `VITE_USE_MOCK=false` in `frontend/.env` to use the real API.
+
+## Security
+
+| Threat | Mitigation |
+|--------|------------|
+| SQL injection | Eloquent / parameterized queries; `LIKE` terms escaped |
+| XSS | Input validation blocks `<>` in text fields; React escapes output; no raw HTML |
+| CSRF / cross-origin abuse | CORS allowlist (`CORS_ALLOWED_ORIGINS`); `same-origin` fetch |
+| Brute force / DoS | Rate limits: `api` (60/min), `enrichment` (15/min) per IP |
+| Oversized payloads | JSON body size cap; search/tag length clamps |
+| Data leaks in errors | Generic API errors when `APP_DEBUG=false`; frontend hides response bodies |
+| Clickjacking | `X-Frame-Options: DENY` |
+| MIME sniffing | `X-Content-Type-Options: nosniff` |
+
+Configure in `backend/.env` (see `.env.example`). Run security tests: `php artisan test --filter=SecurityTest`

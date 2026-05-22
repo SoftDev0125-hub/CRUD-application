@@ -1,4 +1,5 @@
 import type { ListControls } from '../hooks/useGames'
+import { INPUT_LIMITS } from '../utils/inputLimits'
 import { ModeToggle } from './ModeToggle'
 
 interface FilterBarProps {
@@ -45,6 +46,7 @@ export function FilterBar({
             type="search"
             className="input input-search"
             placeholder="Title, designer, publisher…"
+            maxLength={INPUT_LIMITS.search}
             value={controls.search}
             onChange={(e) => onChange('search', e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && onApply()}

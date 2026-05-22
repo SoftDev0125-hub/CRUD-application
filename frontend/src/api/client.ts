@@ -19,9 +19,11 @@ export async function apiRequest<T>(
   const url = path.startsWith('http') ? path : `${baseUrl}${path}`
 
   const response = await fetch(url, {
+    credentials: 'same-origin',
     headers: {
       Accept: 'application/json',
       'Content-Type': 'application/json',
+      'X-Requested-With': 'XMLHttpRequest',
       ...(options.headers ?? {}),
     },
     ...options,

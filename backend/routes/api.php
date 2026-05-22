@@ -9,7 +9,10 @@ Route::get('/health', function (): JsonResponse {
         'status' => 'ok',
         'message' => 'Laravel API is running',
     ]);
-});
+})->middleware('throttle:health');
 
-Route::get('/games/{game}/enrichment', [GameController::class, 'enrichment']);
-Route::apiResource('games', GameController::class);
+Route::middleware(['throttle:api'])->group(function () {
+    Route::get('/games/{game}/enrichment', [GameController::class, 'enrichment'])
+        ->middleware('throttle:enrichment');
+    Route::apiResource('games', GameController::class);
+});

@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import type { BoardGame, GameInput } from '../types/game'
+import { clampText, INPUT_LIMITS, normalizeTagsInput } from '../utils/inputLimits'
 import { EnrichmentPanel } from './EnrichmentPanel'
 
 interface GameFormProps {
@@ -56,10 +57,13 @@ export function GameForm({ mode, initial, onSubmit, onCancel }: GameFormProps) {
     setSaving(true)
     setFormError(null)
 
-    const tags = tagsText
-      .split(',')
-      .map((t) => t.trim().toLowerCase())
-      .filter(Boolean)
+    const tags = normalizeTagsInput(tagsText)
+
+    if (tags.length === 0) {
+      setFormError('Add at least one valid tag (lowercase letters, numbers, hyphens).')
+      setSaving(false)
+      return
+    }
 
     if (form.min_players > form.max_players) {
       setFormError('Min players cannot exceed max players.')
@@ -68,7 +72,16 @@ export function GameForm({ mode, initial, onSubmit, onCancel }: GameFormProps) {
     }
 
     try {
-      await onSubmit({ ...form, tags }, initial?.id)
+      await onSubmit(
+        {
+          ...form,
+          title: clampText(form.title, INPUT_LIMITS.title),
+          designer: clampText(form.designer, INPUT_LIMITS.designer),
+          publisher: clampText(form.publisher, INPUT_LIMITS.publisher),
+          tags,
+        },
+        initial?.id,
+      )
     } catch {
       setFormError('Could not save. Check the API is running.')
     } finally {
